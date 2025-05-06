@@ -11,8 +11,16 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import django_mongodb_backend
-
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access environment variables
+MONGODB_CONNECTION_URI = os.getenv('MONGODB_CONNECTION_URI')
+DB_NAME = os.getenv('DB_NAME')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'country_finder',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +85,7 @@ WSGI_APPLICATION = 'country_book.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": django_mongodb_backend.parse_uri("mongodb://localhost:27017/country_book"),
+    "default": django_mongodb_backend.parse_uri(MONGODB_CONNECTION_URI, db_name=DB_NAME),
 }
 
 # Database routers
