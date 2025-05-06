@@ -1,3 +1,23 @@
-.venv
-.cred.txt
-.*
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Django
+*.log
+*.pot
+*.pyc
+media/
+staticfiles/
+db.sqlite3
+
+# Environment
+.env
+
+# Virtual environment
+.venv/
+venv/
+
+# VSCode/IDE
+.vscode/
+.idea/
