@@ -13,7 +13,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         cca3 = kwargs['cca3'].upper()
+        print('fetching single')
         url = "https://restcountries.com/v3.1/all"
+        print('fetching completed single')
         try:
             response = requests.get(url)
             response.raise_for_status()

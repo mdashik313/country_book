@@ -1,4 +1,0 @@
-1. django-mongodb-backend
-2. pip install python-dotenv
-3. fetch data and save to dg: python3 manage.py fetch_countries
-

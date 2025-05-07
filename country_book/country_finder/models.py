@@ -6,19 +6,15 @@ class Language(models.Model):
     name = models.CharField(max_length=50)
     code = models.CharField(max_length=3, unique=True)
 
-    class Meta:
-        db_table = "language"
-        managed = False
+    # class Meta:
+    #     db_table = "language"
+    #     managed = False
 
     def __str__(self):
         return self.name
 
 class Region(models.Model):
     name = models.CharField(max_length=50, unique=True)
-
-    class Meta:
-        db_table = "region"
-        managed = False
 
     def __str__(self):
         return self.name
@@ -39,7 +35,7 @@ class Country(models.Model):
     idd_suffixes = models.JSONField(blank=True, null=True)
     capital = models.JSONField(blank=True, null=True)
     alt_spellings = models.JSONField(blank=True, null=True)
-    regions = models.ManyToManyField(Region)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, related_name='countries')
     subregion = models.CharField(max_length=50, blank=True, null=True)
     languages = models.ManyToManyField(Language)
     translations = models.JSONField(blank=True, null=True)
@@ -68,10 +64,6 @@ class Country(models.Model):
     postal_code_format = models.CharField(max_length=50, blank=True, null=True)
     postal_code_regex = models.TextField(blank=True, null=True)
     native_names = models.JSONField(blank=True, null=True)
-
-    class Meta:
-        db_table = "country"
-        managed = False
 
     def __str__(self):
         return self.name_common

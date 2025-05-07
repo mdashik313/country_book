@@ -14,9 +14,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from country_finder.views import api_overview  # Import the api_overview view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('country_finder.urls')),
+     path('', api_overview),  # Make sure the root path points to the API overview
 ]
