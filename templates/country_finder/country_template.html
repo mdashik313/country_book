@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Country Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #e0f2fe, #bfdbfe);
+            min-height: 100vh;
+        }
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .flag-img {
+            transition: transform 0.2s;
+        }
+        .flag-img:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <header class="bg-blue-600 text-white py-4 shadow-md">
+        <div class="container mx-auto px-4">
+            <h1 class="text-2xl font-bold">Country Explorer</h1>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Search Section -->
+        <section class="mb-6">
+            <div class="relative">
+                <input type="text" id="searchInput" 
+                       class="w-full p-3 rounded-lg border-2 border-blue-300 focus:border-blue-500 focus:outline-none"
+                       placeholder="Search for a country...">
+                <svg class="absolute right-3 top-3 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Country Table -->
+        <section class="table-container bg-white rounded-lg shadow-lg">
+            <table class="w-full text-left" id="countryTable">
+                <thead class="bg-gray-800 text-white sticky top-0">
+                    <tr>
+                        <th class="p-3">Country</th>
+                        <th class="p-3">Code</th>
+                        <th class="p-3">Capital</th>
+                        <th class="p-3">Population</th>
+                        <th class="p-3">Timezones</th>
+                        <th class="p-3">Flag</th>
+                        <th class="p-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Modal for Details -->
+    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden" id="detailsModal" aria-hidden="true">
+        <div class="relative top-20 mx-auto p-5 w-11/12 max-w-2xl bg-white rounded-lg shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Country Details</h3>
+                <button class="text-gray-500 hover:text-gray-700" onclick="this.closest('#detailsModal').classList.add('hidden')">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="text-gray-600">
+                <h4 class="font-medium mb-2">Countries in Same Region:</h4>
+                <ul id="regionCountriesList" class="list-disc pl-5 mb-4"></ul>
+                <h4 class="font-medium mb-2">Languages:</h4>
+                <ul id="languageList" class="list-disc pl-5"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/countries/';
+
+        async function fetchCountries(query = '') {
+            const url = query ? `${API_BASE}search/?q=${query}` : API_BASE;
+            const res = await fetch(url);
+            const data = await res.json();
+            const tbody = document.querySelector("#countryTable tbody");
+            tbody.innerHTML = '';
+
+            data.forEach(country => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-100';
+                row.innerHTML = `
+                    <td class="p-3">${country.name_common}</td>
+                    <td class="p-3">${country.cca2}</td>
+                    <td class="p-3">${country.capital?.[0] || 'N/A'}</td>
+                    <td class="p-3">${country.population.toLocaleString()}</td>
+                    <td class="p-3">${country.timezones?.join(', ') || 'N/A'}</td>
+                    <td class="p-3"><img src="${country.flag_png}" alt="Flag" class="flag-img h-8"></td>
+                    <td class="p-3">
+                        <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" 
+                                onclick="showDetails('${country.id}')">Details</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function showDetails(countryId) {
+            const countryRes = await fetch(`${API_BASE}${countryId}/`);
+            const country = await countryRes.json();
+
+            const regionRes = await fetch(`${API_BASE}${countryId}/same-region/`);
+            const regionCountries = await regionRes.json();
+
+            const regionList = document.getElementById("regionCountriesList");
+            regionList.innerHTML = regionCountries.map(c => `<li>${c.name_common}</li>`).join('');
+
+            const languageList = document.getElementById("languageList");
+            const langIds = country.languages;
+
+            const languages = await Promise.all(
+                langIds.map(id => fetch(`/api/languages/${id}/`).then(res => res.json()))
+            );
+            languageList.innerHTML = languages.map(l => `<li>${l.name} (${l.code})</li>`).join('');
+
+            document.getElementById("detailsModal").classList.remove('hidden');
+        }
+
+        document.getElementById("searchInput").addEventListener("input", function () {
+            const query = this.value.trim();
+            fetchCountries(query);
+        });
+
+        window.onload = () => fetchCountries();
+    </script>
+</body>
+</html>
