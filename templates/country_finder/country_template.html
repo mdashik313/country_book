@@ -20,6 +20,10 @@
         .flag-img:hover {
             transform: scale(1.2);
         }
+        .modal-content-scrollable {
+            max-height: 400px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -31,7 +35,7 @@
 
     <main class="container mx-auto px-4 py-8">
         <!-- Search Section -->
-        <section class="mb-6 max-w-3xl mx-auto">
+        <section class="mb-6 max-w-4xl mx-auto">
             <div class="relative">
                 <input type="text" id="searchInput" 
                        class="w-full p-3 rounded-lg border-2 border-blue-300 focus:border-blue-500 focus:outline-none"
@@ -44,7 +48,7 @@
         </section>
 
         <!-- Country Table -->
-        <section class="table-container bg-white rounded-lg shadow-lg max-w-3xl mx-auto">
+        <section class="table-container bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
             <table class="w-full text-left" id="countryTable">
                 <thead class="bg-gray-800 text-white sticky top-0">
                     <tr>
@@ -59,6 +63,10 @@
                 </thead>
                 <tbody class="text-gray-700"></tbody>
             </table>
+            <div id="paginationControls" class="flex justify-center space-x-4 p-4">
+                <button id="prevPage" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Previous</button>
+                <button id="nextPage" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Next</button>
+            </div>
         </section>
     </main>
 
@@ -73,7 +81,7 @@
                     </svg>
                 </button>
             </div>
-            <div class="text-gray-600">
+            <div class="text-gray-600 modal-content-scrollable">
                 <h4 class="font-medium mb-2">Countries in Same Region:</h4>
                 <ul id="regionCountriesList" class="list-disc pl-5 mb-4"></ul>
                 <h4 class="font-medium mb-2">Languages:</h4>
@@ -85,14 +93,24 @@
     <script>
         const API_BASE = '/api/countries/';
 
-        async function fetchCountries(query = '') {
-            const url = query ? `${API_BASE}search/?q=${query}` : API_BASE;
+        let currentPage = 1;
+        let currentQuery = '';
+
+        async function fetchCountries(query = '', page = 1) {
+            currentQuery = query;
+            currentPage = page;
+            const url = query 
+                ? `${API_BASE}search/?q=${query}&page=${page}` 
+                : `${API_BASE}?page=${page}`;
+            
             const res = await fetch(url);
             const data = await res.json();
+            const countries = data.results || data; // Fallback if not paginated
+
             const tbody = document.querySelector("#countryTable tbody");
             tbody.innerHTML = '';
 
-            data.forEach(country => {
+            countries.forEach(country => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-100';
                 row.innerHTML = `
@@ -109,32 +127,42 @@
                 `;
                 tbody.appendChild(row);
             });
+
+            // Handle pagination buttons
+            document.getElementById("prevPage").disabled = !data.previous;
+            document.getElementById("nextPage").disabled = !data.next;
+            
         }
 
         async function showDetails(countryId) {
-            const countryRes = await fetch(`${API_BASE}${countryId}/`);
-            const country = await countryRes.json();
 
             const regionRes = await fetch(`${API_BASE}${countryId}/same-region/`);
-            const regionCountries = await regionRes.json();
+            const regionData = await regionRes.json();
 
-            const regionList = document.getElementById("regionCountriesList");
-            regionList.innerHTML = regionCountries.map(c => `<li>${c.name_common}</li>`).join('');
+            const countryList = document.getElementById("regionCountriesList");
+            countryList.innerHTML = regionData.countries.map(c => `<li>${c.name_common}</li>`).join('');
 
             const languageList = document.getElementById("languageList");
-            const langIds = country.languages;
-
-            const languages = await Promise.all(
-                langIds.map(id => fetch(`/api/languages/${id}/`).then(res => res.json()))
-            );
-            languageList.innerHTML = languages.map(l => `<li>${l.name} (${l.code})</li>`).join('');
+            languageList.innerHTML = regionData.languages.map(l => `<li>${l.name} (${l.code})</li>`).join('');
 
             document.getElementById("detailsModal").classList.remove('hidden');
         }
 
+
         document.getElementById("searchInput").addEventListener("input", function () {
             const query = this.value.trim();
-            fetchCountries(query);
+            fetchCountries(query, 1);  // reset to page 1 while searching
+        });
+
+        // event listener for pagination buttons:
+        document.getElementById("prevPage").addEventListener("click", () => {
+            if (currentPage > 1) {
+                fetchCountries(currentQuery, currentPage - 1);
+            }
+        });
+
+        document.getElementById("nextPage").addEventListener("click", () => {
+            fetchCountries(currentQuery, currentPage + 1);
         });
 
         window.onload = () => fetchCountries();

@@ -39,16 +39,28 @@ class CountryViewSet(viewsets.ModelViewSet):
 
         return Response(self.get_serializer(country).data, status=status.HTTP_201_CREATED)
 
-    # List same regional countries
+    # List same regional countries and languages of the countries
     @action(detail=True, methods=['get'], url_path='same-region')
     def same_region(self, request, pk=None):
         country = self.get_object()
         region = country.region
         if not region:
             return Response({"detail": "This country does not have a region."}, status=400)
+        # countries = Country.objects.filter(region=region).exclude(id=country.id)
+        # serializer = self.get_serializer(countries, many=True)
+        # return Response(serializer.data)
+        # Fetch other countries in the same region
         countries = Country.objects.filter(region=region).exclude(id=country.id)
-        serializer = self.get_serializer(countries, many=True)
-        return Response(serializer.data)
+        country_serializer = self.get_serializer(countries, many=True)
+
+        # Get all languages used by those countries
+        languages = Language.objects.filter(country__in=countries).distinct()
+        language_serializer = LanguageSerializer(languages, many=True)
+
+        return Response({
+            "countries": country_serializer.data,
+            "languages": language_serializer.data
+        })
 
     # List countries by language name
     @action(detail=False, methods=['get'], url_path='by-language/(?P<name>[^/.]+)')
