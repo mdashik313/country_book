@@ -22,5 +22,5 @@ from country_finder.views import api_overview  # Import the api_overview view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('country_finder.urls')),
-     path('', api_overview),  # Make sure the root path points to the API overview
+    path('', api_overview),  # Make sure the root path points to the API overview
 ]

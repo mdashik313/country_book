@@ -10,5 +10,5 @@ router.register(r'languages', LanguageViewSet, basename='language')
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('countries/', country_html_view, name='country-html-view'),
+    path('country-list/', country_html_view, name='country-html-view'),
 ]
