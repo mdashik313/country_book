@@ -37,7 +37,17 @@ class CountryViewSet(viewsets.ModelViewSet):
 
         return Response(self.get_serializer(country).data, status=status.HTTP_201_CREATED)
 
-    
+    # List same regional countries
+    @action(detail=True, methods=['get'], url_path='same-region')
+    def same_region(self, request, pk=None):
+        country = self.get_object()
+        region = country.region
+        if not region:
+            return Response({"detail": "This country does not have a region."}, status=400)
+        countries = Country.objects.filter(region=region).exclude(id=country.id)
+        serializer = self.get_serializer(countries, many=True)
+        return Response(serializer.data)
+
 
 class RegionViewSet(viewsets.ModelViewSet):
     queryset = Region.objects.all()
