@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Country Explorer</title>
+    <title>Country Book</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
@@ -28,10 +28,13 @@
 </head>
 <body class="font-sans antialiased">
     <header class="bg-blue-600 text-white py-4 shadow-md">
-        <div class="container mx-auto px-4">
-            <h1 class="text-2xl font-bold">Country Explorer</h1>
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Country Book</h1>
+            <a href="{% url 'country_finder:logout' %}" class="text-white underline hover:text-gray-200">Logout</a>
+
         </div>
     </header>
+
 
     <main class="container mx-auto px-4 py-8">
         <!-- Search Section -->
