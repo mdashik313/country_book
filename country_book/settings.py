@@ -73,21 +73,21 @@ WSGI_APPLICATION = 'country_book.wsgi.application'
 DATABASES = {
     'default': {
         # for sqlite
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
 
         # for postgre
-        'ENGINE': 'django.db.backends.postgresql',
+        # 'ENGINE': 'django.db.backends.postgresql',
 
-        'NAME': os.getenv('DB_NAME'),
+        # 'NAME': os.getenv('DB_NAME'),
 
-        'USER': os.getenv('DB_USER'),
+        # 'USER': os.getenv('DB_USER'),
 
-        'PASSWORD': os.getenv('DB_PASSWORD'),
+        # 'PASSWORD': os.getenv('DB_PASSWORD'),
 
-        'HOST': os.getenv('DB_HOST'),
+        # 'HOST': os.getenv('DB_HOST'),
 
-        'PORT': os.getenv('DB_PORT'),
+        # 'PORT': os.getenv('DB_PORT'),
     }
 }
 

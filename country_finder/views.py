@@ -48,13 +48,14 @@ class CountryViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(countries, many=True)
         return Response(serializer.data)
 
-    # List countries by language code
-    @action(detail=False, methods=['get'], url_path='by-language/(?P<code>[^/.]+)')
-    def by_language(self, request, code=None):
+    # List countries by language name
+    @action(detail=False, methods=['get'], url_path='by-language/(?P<name>[^/.]+)')
+    def by_language(self, request, name=None):
         try:
-            language = Language.objects.get(code=code)
+            language = Language.objects.get(name__iexact=name)
         except Language.DoesNotExist:
             return Response({"detail": "Language not found."}, status=404)
+
         countries = Country.objects.filter(languages=language)
         serializer = self.get_serializer(countries, many=True)
         return Response(serializer.data)
