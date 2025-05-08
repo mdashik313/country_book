@@ -59,7 +59,15 @@ class CountryViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(countries, many=True)
         return Response(serializer.data)
 
-    
+    # Search by partial country name
+    @action(detail=False, methods=['get'], url_path='search')
+    def search_by_name(self, request):
+        query = request.query_params.get('q', '')
+        if not query:
+            return Response({"detail": "Search query parameter 'q' is required."}, status=400)
+        countries = Country.objects.filter(Q(name_common__icontains=query) | Q(name_official__icontains=query))
+        serializer = self.get_serializer(countries, many=True)
+        return Response(serializer.data)
 
 class RegionViewSet(viewsets.ModelViewSet):
     queryset = Region.objects.all()
@@ -80,7 +88,7 @@ def api_overview(request):
         "Retrieve/Update/Delete Country": request.build_absolute_uri('/api/countries/<id>/'),
         "Same Region Countries": request.build_absolute_uri('/api/countries/<id>/same-region/'),
         "Countries by Language": request.build_absolute_uri('/api/countries/by-language/<code>/'),
-        
+        "Search Country by Name": request.build_absolute_uri('/api/countries/search/?q=<partial-name>'),
 
         "List Languages": request.build_absolute_uri('/api/languages/'),
         "Create Language": request.build_absolute_uri('/api/languages/'),
