@@ -41,6 +41,7 @@ Django==5.1.8
 djangorestframework==3.16.0
 psycopg2-binary==2.9.10
 python=3.10.12 or later
+gunicorn==23.0.0
 ```
 
 ## Database setup and configuration
