@@ -48,6 +48,18 @@ class CountryViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(countries, many=True)
         return Response(serializer.data)
 
+    # List countries by language code
+    @action(detail=False, methods=['get'], url_path='by-language/(?P<code>[^/.]+)')
+    def by_language(self, request, code=None):
+        try:
+            language = Language.objects.get(code=code)
+        except Language.DoesNotExist:
+            return Response({"detail": "Language not found."}, status=404)
+        countries = Country.objects.filter(languages=language)
+        serializer = self.get_serializer(countries, many=True)
+        return Response(serializer.data)
+
+    
 
 class RegionViewSet(viewsets.ModelViewSet):
     queryset = Region.objects.all()
@@ -68,7 +80,7 @@ def api_overview(request):
         "Retrieve/Update/Delete Country": request.build_absolute_uri('/api/countries/<id>/'),
         "Same Region Countries": request.build_absolute_uri('/api/countries/<id>/same-region/'),
         "Countries by Language": request.build_absolute_uri('/api/countries/by-language/<code>/'),
-        "Search Country by Name": request.build_absolute_uri('/api/countries/search/?q=<partial-name>'),
+        
 
         "List Languages": request.build_absolute_uri('/api/languages/'),
         "Create Language": request.build_absolute_uri('/api/languages/'),
