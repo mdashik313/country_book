@@ -67,6 +67,7 @@ class CountryViewSet(viewsets.ModelViewSet):
         if not query:
             return Response({"detail": "Search query parameter 'q' is required."}, status=400)
         countries = Country.objects.filter(Q(name_common__icontains=query) | Q(name_official__icontains=query))
+        
         serializer = self.get_serializer(countries, many=True)
         return Response(serializer.data)
 
