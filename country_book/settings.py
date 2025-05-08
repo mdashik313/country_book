@@ -79,31 +79,23 @@ WSGI_APPLICATION = 'country_book.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-if os.getenv('LIVE') is True:
-    DATABASES = {
-        'default': {
-            # for postgre
-            'ENGINE': 'django.db.backends.postgresql',
+DATABASES = {
+    'default': {
+        # for postgre
+        'ENGINE': 'django.db.backends.postgresql',
 
-            'NAME': os.getenv('DB_NAME'),
+        'NAME': os.getenv('DB_NAME'),
 
-            'USER': os.getenv('DB_USER'),
+        'USER': os.getenv('DB_USER'),
 
-            'PASSWORD': os.getenv('DB_PASSWORD'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
 
-            'HOST': os.getenv('DB_HOST'),
+        'HOST': os.getenv('DB_HOST'),
 
-            'PORT': os.getenv('DB_PORT'),
-        }
+        'PORT': os.getenv('DB_PORT'),
     }
-else:
-    DATABASES = {
-        'default': {
-            # for sqlite
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -146,4 +138,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = "country_finder:country_html_view"
+LOGIN_REDIRECT_URL = "country_finder:home"

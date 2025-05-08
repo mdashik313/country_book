@@ -121,7 +121,7 @@ def api_overview(request):
     })
 
 @login_required
-def country_html_view(request):
+def home(request):
     return render(request, "country_template.html")
 
 
@@ -160,4 +160,4 @@ def signup_view(request):
         return redirect("country_finder:login")
     
     # Render the registration page template (GET request)
-    return render(request, "country_finder/signup.html")
+    return render(request, "registration/signup.html")
