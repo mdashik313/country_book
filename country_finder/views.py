@@ -5,6 +5,8 @@ from rest_framework.decorators import action
 from .models import Country, Region, Language
 from .serializers import CountrySerializer, RegionSerializer, LanguageSerializer
 from django.db.models import Q
+from django.shortcuts import render
+
 
 
 class CountryViewSet(viewsets.ModelViewSet):
@@ -100,3 +102,6 @@ def api_overview(request):
         "Create Region": request.build_absolute_uri('/api/regions/'),
         "Retrieve/Update/Delete Region": request.build_absolute_uri('/api/regions/<id>/'),
     })
+
+def country_html_view(request):
+    return render(request, 'country_finder\country_template.html')

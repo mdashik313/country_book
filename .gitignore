@@ -21,3 +21,5 @@ venv/
 # VSCode/IDE
 .vscode/
 .idea/
+
+country_templateBak.html
