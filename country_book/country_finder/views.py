@@ -39,6 +39,14 @@ class CountryViewSet(viewsets.ModelViewSet):
 
     
 
+class RegionViewSet(viewsets.ModelViewSet):
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer
+
+class LanguageViewSet(viewsets.ModelViewSet):
+    queryset = Language.objects.all()
+    serializer_class = LanguageSerializer
+
 
 @api_view(['GET'])
 def api_overview(request):
